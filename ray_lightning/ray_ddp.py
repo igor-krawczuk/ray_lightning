@@ -289,13 +289,13 @@ class RayStrategy(DDPSpawnStrategy):
 
                 # Adjust to support multiple GPUs per worker or fractional
                 # GPUs per worker.
-                gpu_id = ray.get_gpu_ids()[0]
+                gpu_id = int(ray.get_gpu_ids()[0]) # make sure we have an integer
                 cuda_visible_str = os.environ.get("CUDA_VISIBLE_DEVICES", "")
                 if cuda_visible_str and cuda_visible_str != "NoDevFiles":
                     cuda_visible_list = [
-                        int(dev) for dev in cuda_visible_str.split(",")
+                        int(dev) for dev in cuda_visible_str.split(",") # since we cast to integers here as well
                     ]
-                    device_id = cuda_visible_list.index(gpu_id)
+                    device_id = cuda_visible_list.index(gpu_id) # so that we do not error here
                     return torch.device("cuda", device_id)
                 else:
                     raise RuntimeError(
